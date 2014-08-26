@@ -157,42 +157,99 @@ $(function(){
 
 $(function(){
 
-  var getOptionsFromString = function(str, options){
-    console.log(str);
-    if (str == "all" || str === undefined || str == null) {
-      return options;
-    }
-    var matches = [];
-    if (str.indexOf("contracts") != -1){
-      matches = matches.concat(["gold", "silver", "bronze"]);
-    }
+  var checkboxes = $(".license-check");
+  checkboxes.click(function() {
 
-    for (var i =0; i < options.length; i++){
-      if (str.indexOf(options[i]) != -1){
-        matches.append(options[i]);
+    var allOptions = {gold: [], silver: [], bronze: [], elite: [], creative: [],
+      performance: [], oem: [], essential: [], trial: []};
+
+    for (var key in allOptions){
+      allOptions[key] = [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,];
+    }
+    for (var i = 0; i < checkboxes.length; i++){
+      var skustr = checkboxes.eq(i).data('skus');
+      if (skustr == undefined) continue;
+      var worksfor = skustr.split(',');
+      if (skustr == "*" || skustr.indexOf('-') > -1){
+        for (var key in allOptions){
+          allOptions[key][i] = true;
+        }
       }
-     }
-    return matches;
-  };
+      if (skustr == "*") continue;
 
+      if (skustr.indexOf('-') > -1){
+        for (var j = 0; j < worksfor.length; j++){
+          var key = worksfor[j];
+          if (key.charAt(0) == "-") {
+            key = key.substr(1);
+          }
+          var sku = allOptions[key];
+          if (!sku){
+            alert("Invalid SKU " + worksfor[j] + " listed in checkbox " + i);
+          }else{
+            sku[i] = true;
+          }
+        }
+      }else{
+        for (var j = 0; j < worksfor.length; j++){
+          var sku = allOptions[worksfor[j]];
+          if (!sku){
+            alert("Invalid SKU " + worksfor[j] + " listed in checkbox " + i);
+          }else{
+            sku[i] = true;
+          }
+        }
+      }
+    }
 
-  $(".questions input").click(function(e){
-    var options = ["essential", "trial", "performance", "creative", "elite", "silver", "gold", "bronze", "oem"];
+    var results = {};
+    for (var key in allOptions){
+      var passes = true;
+      for (var i = 0; i < checkboxes.length; i++){
+        if (checkboxes[i].checked && allOptions[key][i] !== true){
+          passes = false;
+        }
+      }
+      if (passes){
+        results[key] = true;
+      }
+    }
+    console.log(results);
 
-    var limits = options.slice();
+    for (var key in allOptions){
+      if (results[key]) {
+        $("." + key).show();
+      }else{
+        $("." + key).hide();
+      }
+    }
 
-    $(".questions input").each(function(index){
-      var input = $(this);
-      console.log(input);
-      var checked = input.prop('checked');
-      var results = getOptionsFromString(input.data('data-skus'), options);
+    //Update checkbox values
+    for (var i = 0; i < checkboxes.length; i++){
+      var box = checkboxes.eq(i);
+      var matches = [];
+      for (var key in allOptions){
+        if (allOptions[key][i] === true){
+          matches.push(key);
+        }
+      }
+      var intersection = [];
+      for (var j = 0; j < matches.length; j++){
+        if (results[matches[j]]){
+          intersection.push(matches[j]);
+        }
+      }
+      if (intersection.length == 0){
+        box.attr("disabled", true);
+      }else{
+        box.removeAttr("disabled");
+      }
+      var span = box.nextAll("span.count").first();
+      if (span){
+        span.text(" (" + intersection.length + ")");
+      }
 
-      limits = limits.filter(function(n) {
-          return results.indexOf(n) != -1
-      });
-      
-    });
-    alert("Allowed options: " + limits);   
+    }
+
   });
 });
-
