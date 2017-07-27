@@ -49,6 +49,17 @@ cf login -u "$CF_USER" -p "$CF_PASS" -o "$CF_ORG" -s "$ACTUAL_BRANCH"
 ######################
 echo -e "${GREEN}[+] Pushing application"
 cd - # Go back to the application's folder
+
+echo -e "configuring bin directory"
+cat > ./bin/env <<-'EOF'
+#!/bin/bash
+export HOME=/app
+. "${HOME}/.profile.d"/*ruby.sh
+cd "${HOME}"
+exec $*
+EOF
+chmod +x ./bin/env
+
 rm -rf vendor/bundle
 cf rename $APPLICATION_NAME ${APPLICATION_NAME}-old
 if ! cf push $APPLICATION_NAME -f ./${ACTUAL_BRANCH}-manifest.yml --no-start; then
