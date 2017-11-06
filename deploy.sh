@@ -59,7 +59,10 @@ cf login -u "$CF_USER" -p "$CF_PASS" -o "$CF_ORG" -s "$ACTUAL_BRANCH"
 ######################
 echo -e "${GREEN}[+] Pushing application"
 cd - # Go back to the application's folder
-rm -rf vendor/bundle
+
+rm -rf ./vendor/bundle
+rm -rf .bundle/config
+
 cf rename $APPLICATION_NAME ${APPLICATION_NAME}-old
 if ! cf push $APPLICATION_NAME -f ./${ACTUAL_BRANCH}-manifest.yml --no-start; then
     echo -e "${RED}[-] Application could not be pushed, rolling back..."
