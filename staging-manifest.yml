@@ -3,6 +3,6 @@ applications:
 - name: resizer-web
   buildpack: ruby_buildpack
   routes:
-  - route: resizer-web-staging.run.platform.nirdhost.com
+  - route: resizer-web-staging.cfapps.io
   memory: 256MB
   instances: 1

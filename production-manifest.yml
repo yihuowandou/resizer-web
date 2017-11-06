@@ -2,5 +2,9 @@
 applications:
 - name: resizer-web
   buildpack: ruby_buildpack
+  routes:
+  - route: resizer-web.cfapps.io
+  - route: imageresizing.net
+  - route: www.imageresizing.net
   memory: 256MB
   instances: 2
